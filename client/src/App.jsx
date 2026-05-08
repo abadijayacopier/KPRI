@@ -983,7 +983,7 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                 <div style={{ position: 'absolute', bottom: `${layout.backFooterBottom}mm`, left: 0, right: 0, textAlign: 'center', zIndex: 3, color: primaryColor, fontWeight: 'bold', fontSize: `${layout.backFooterFontSize}pt`, fontStyle: 'italic' }}>
                     {backText.footer}
                 </div>
-                <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '0.5px dashed rgba(255,255,255,0.3)', borderRadius: '2mm', zIndex: 10, pointerEvents: 'none' }}></div>
+                <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '1px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
             </div>
         );
     }
@@ -1160,6 +1160,7 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
             }}>
                 <QRCodeSVG value={String(member.no_anggota)} size={layout.qrSize} />
             </div>
+            <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '1px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
         </div>
     );
 };
