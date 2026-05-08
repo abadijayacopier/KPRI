@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --primary: #00479b;
+  --secondary: #64748b;
+  --background: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #0f172a;
+  --accent: #ef4444;
+  
+  --id-width: 92mm;
+  --id-height: 60mm;
+  --text-margin: 5mm;
+  --text-width: 82mm; /* 92 - 10 */
+  --text-height: 50mm; /* 60 - 10 */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* UI Components */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+h1, h2 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #003a80;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: var(--accent);
+  color: white;
+}
+
+/* ID Card Component */
+.id-card-render {
+  width: var(--id-width);
+  height: var(--id-height);
+  position: relative;
+  background: white;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  page-break-inside: avoid;
+}
+
+.id-card-header {
+  background: var(--primary);
+  height: 20mm;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  padding: 0 5mm;
+}
+
+.id-card-body {
+  position: absolute;
+  top: 5mm;
+  left: 5mm;
+  width: var(--text-width);
+  height: var(--text-height);
+  padding: 2mm;
+  display: flex;
+  flex-direction: column;
+}
+
+.id-card-content {
+  margin-top: 15mm;
+  font-size: 8pt;
+}
+
+.id-card-row {
+  display: flex;
+  margin-bottom: 2mm;
+}
+
+.id-card-label {
+  width: 25mm;
+  font-weight: bold;
+}
+
+.id-card-qr {
+  position: absolute;
+  bottom: 2mm;
+  right: 2mm;
+}
+
+.id-card-footer {
+  position: absolute;
+  bottom: 2mm;
+  left: 2mm;
+  font-size: 7pt;
+  color: var(--primary);
+  font-style: italic;
+}
+
+/* Print Layout */
+.print-media-a3plus {
+    width: 470mm;
+    height: 310mm;
+    padding: 5mm;
+    background: white;
+    display: grid;
+    grid-template-columns: repeat(5, 92mm);
+    grid-template-rows: repeat(5, 60mm);
+    gap: 0;
+    page-break-after: always;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+@media print {
+    @page {
+        size: 470mm 310mm;
+        margin: 0 !important;
+    }
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-area {
+        display: block !important;
+    }
+}
+
+.no-print {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.member-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.member-list th, .member-list td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.member-list th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.control-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.control-group span {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 700;
+  text-align: right;
+}
