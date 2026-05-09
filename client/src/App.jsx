@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useReactToPrint } from 'react-to-print';
 import { QRCodeSVG } from 'qrcode.react';
-import { Upload, Printer, Trash2, Users, FileSpreadsheet, Plus, Save, RotateCcw, Search, Edit2, Download, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { Upload, Printer, Trash2, Users, FileSpreadsheet, Plus, Save, RotateCcw, Search, Edit2, Download, ChevronLeft, ChevronRight, FileText, Eye } from 'lucide-react';
 
 // Dynamic script loader for PDF libraries
 const loadScript = (src) => {
@@ -24,6 +24,7 @@ const App = () => {
     const [bgFront, setBgFront] = useState(localStorage.getItem('idcard_bgFront') || null);
     const [bgBack, setBgBack] = useState(localStorage.getItem('idcard_bgBack') || null);
     const [printBackOnce, setPrintBackOnce] = useState(false);
+    const [previewMember, setPreviewMember] = useState(null);
     const [backText, setBackText] = useState(() => {
         try {
             const saved = localStorage.getItem('idcard_backText');
@@ -165,6 +166,7 @@ const App = () => {
     const previewData = selectedMembers.length > 0 ? selectedMembers : members;
 
     useEffect(() => {
+        loadScript('https://cdn.jsdelivr.net/npm/sweetalert2@11');
         fetchMembers();
     }, []);
 
@@ -392,6 +394,115 @@ const App = () => {
         }
     };
 
+    const handleExportImage = async (side, memberId) => {
+        try {
+            // Load html2canvas if not already loaded
+            if (!window.html2canvas) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+            }
+
+            // Try different ID patterns for preview list or modal
+            let element = document.getElementById(`preview-${side}-${memberId}`);
+            if (!element) element = document.getElementById(`modal-${side}-${memberId}`);
+
+            const targetMember = members.find(m => String(m.id) === String(memberId)) || { nama: 'ANGGOTA' };
+            const safeName = targetMember.nama.replace(/[^a-z0-9]/gi, '_').toUpperCase();
+
+            // Capture BOTH sides for the premium mockup
+            const frontEl = document.getElementById(`preview-front-${memberId}`) || document.getElementById(`modal-front-${memberId}`);
+            const backEl = document.getElementById(`preview-back-${memberId}`) || document.getElementById(`modal-back-${memberId}`);
+
+            if (!frontEl || !backEl) return alert('Elemen kartu tidak lengkap! Mohon pastikan preview depan & belakang terlihat.');
+
+            const frontCanvas = await window.html2canvas(frontEl, { scale: 3, useCORS: true });
+            const backCanvas = await window.html2canvas(backEl, { scale: 3, useCORS: true });
+
+            // 1. Setup Mockup Canvas (Large size for 2 cards + Header)
+            const mockupCanvas = document.createElement('canvas');
+            const ctx = mockupCanvas.getContext('2d');
+            mockupCanvas.width = 1600;
+            mockupCanvas.height = 1600;
+
+            // 2. Draw Realistic Background (Desk Texture)
+            const grad = ctx.createLinearGradient(0, 0, 0, 1600);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.2, '#f8fafc');
+            grad.addColorStop(1, '#e2e8f0');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 1600, 1600);
+            
+            // Subtle texture/lines
+            ctx.strokeStyle = 'rgba(0,0,0,0.03)';
+            for(let i=0; i<1600; i+=20) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1600, i); ctx.stroke();
+            }
+
+            // 3. Draw BRANDED HEADER
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#64748b'; ctx.font = 'bold 35px Inter, sans-serif'; ctx.fillText('MOCKUP KARTU', 800, 100);
+            ctx.fillStyle = '#1e293b'; ctx.font = '900 85px Inter, sans-serif'; ctx.fillText('ABADI JAYA', 800, 200);
+            ctx.fillStyle = '#334155'; ctx.font = 'bold 38px Inter, sans-serif'; ctx.fillText('Fotocopy, ATK, Digital Print, & Percetakan', 800, 265);
+            ctx.fillStyle = '#475569'; ctx.font = '32px Inter, sans-serif'; ctx.fillText('Desa Kediren kec. Lembeyan - Magetan | WA / 085655620979', 800, 320);
+            
+            ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 2; ctx.moveTo(200, 380); ctx.lineTo(1400, 380); ctx.stroke();
+
+            // 4. FUNCTION TO DRAW ROUNDED CARD WITH SHADOW
+            const drawRoundedCard = (srcCanvas, x, y, rotation, scale = 1) => {
+                const w = (86 / 92) * srcCanvas.width * scale;
+                const h = (54 / 60) * srcCanvas.height * scale;
+                const off = (3 / 92) * srcCanvas.width;
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(rotation);
+                
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 40;
+                ctx.shadowOffsetX = 15;
+                ctx.shadowOffsetY = 20;
+
+                const radius = 40 * scale;
+                ctx.beginPath();
+                ctx.moveTo(-w/2 + radius, -h/2);
+                ctx.lineTo(w/2 - radius, -h/2);
+                ctx.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + radius);
+                ctx.lineTo(w/2, h/2 - radius);
+                ctx.quadraticCurveTo(w/2, h/2, w/2 - radius, h/2);
+                ctx.lineTo(-w/2 + radius, h/2);
+                ctx.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - radius);
+                ctx.lineTo(-w/2, -h/2 + radius);
+                ctx.quadraticCurveTo(-w/2, -h/2, -w/2 + radius, -h/2);
+                ctx.closePath();
+                ctx.clip();
+
+                ctx.drawImage(srcCanvas, off, off, srcCanvas.width - off*2, srcCanvas.height - off*2, -w/2, -h/2, w, h);
+                ctx.restore();
+            };
+
+            // 5. DRAW THE STACK
+            drawRoundedCard(backCanvas, 900, 1000, Math.PI / 12, 0.9); 
+            drawRoundedCard(frontCanvas, 750, 950, 0, 1.0);
+
+            // 6. WATERMARK (Top Layer)
+            ctx.save();
+            ctx.translate(800, 950);
+            ctx.rotate(-Math.PI / 6);
+            ctx.font = 'bold 120px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.textAlign = 'center';
+            ctx.fillText('ABADI JAYA COPIER', 0, 0);
+            ctx.restore();
+
+            const link = document.createElement('a');
+            link.download = `PREMIUM_MOCKUP_${safeName}.jpg`;
+            link.href = mockupCanvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        } catch (err) {
+            console.error(err);
+            alert('Gagal membuat mockup. Pastikan preview terlihat.');
+        }
+    };
+
     return (
         <div className="app-container">
             <header className="no-print">
@@ -484,10 +595,11 @@ const App = () => {
                                     />
                                     <span style={{ marginLeft: '5px', fontSize: '0.8rem' }}>All Filtered</span>
                                 </th>
-                                <th>No Anggota</th>
+                                <th>No. Anggota</th>
                                 <th>Nama</th>
+                                <th>Alamat</th>
                                 <th>Unit</th>
-                                <th>Action</th>
+                                <th style={{ width: '100px' }}>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -502,13 +614,89 @@ const App = () => {
                                     </td>
                                     <td>{member.no_anggota}</td>
                                     <td>{member.nama}</td>
+                                    <td>{member.alamat}</td>
                                     <td>{member.unit}</td>
-                                    <td>
-                                        <button onClick={async () => {
-                                            await axios.delete(`/api/members/${member.id}`);
-                                            fetchMembers();
-                                        }} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer' }}>
-                                            <Trash2 size={16} />
+                                    <td style={{ display: 'flex', gap: '5px' }}>
+                                        <button 
+                                            onClick={() => setPreviewMember(member)} 
+                                            className="btn btn-sm" 
+                                            style={{ background: '#6366f1', color: 'white', padding: '5px', display: 'flex', alignItems: 'center' }}
+                                            title="Preview"
+                                        >
+                                            <Eye size={14} />
+                                        </button>
+                                        <button 
+                                            onClick={async () => {
+                                                if (!window.Swal) return;
+                                                const { value: formValues } = await window.Swal.fire({
+                                                    title: 'Edit Data Anggota',
+                                                    html:
+                                                        `<div style="text-align: left; padding: 0 10px;">` +
+                                                        `<label style="display:block; margin-bottom:5px; font-weight:bold; font-size:0.9rem;">Nomor Anggota</label>` +
+                                                        `<input id="swal-no" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="No. Anggota" value="${member.no_anggota}">` +
+                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Nama Lengkap</label>` +
+                                                        `<input id="swal-nama" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Nama" value="${member.nama}">` +
+                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Alamat</label>` +
+                                                        `<input id="swal-alamat" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Alamat" value="${member.alamat}">` +
+                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Unit / Instansi</label>` +
+                                                        `<input id="swal-unit" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Unit" value="${member.unit}">` +
+                                                        `</div>`,
+                                                    width: '500px',
+                                                    focusConfirm: false,
+                                                    preConfirm: () => {
+                                                        return {
+                                                            no_anggota: document.getElementById('swal-no').value,
+                                                            nama: document.getElementById('swal-nama').value,
+                                                            alamat: document.getElementById('swal-alamat').value,
+                                                            unit: document.getElementById('swal-unit').value
+                                                        }
+                                                    }
+                                                });
+                                                if (formValues) {
+                                                    try {
+                                                        await axios.put(`/api/members/${member.id}`, formValues);
+                                                        window.Swal.fire({
+                                                            toast: true,
+                                                            position: 'top-end',
+                                                            icon: 'success',
+                                                            title: 'Data berhasil diperbarui',
+                                                            showConfirmButton: false,
+                                                            timer: 2000
+                                                        });
+                                                        fetchMembers();
+                                                    } catch (err) {
+                                                        window.Swal.fire('Error', 'Gagal memperbarui data', 'error');
+                                                    }
+                                                }
+                                            }} 
+                                            className="btn btn-sm" 
+                                            style={{ background: '#f59e0b', color: 'white', padding: '5px', display: 'flex', alignItems: 'center' }}
+                                            title="Edit"
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button 
+                                            onClick={async () => {
+                                                if (!window.Swal) return;
+                                                const result = await window.Swal.fire({
+                                                    title: 'Hapus data?',
+                                                    text: "Data tidak bisa dikembalikan!",
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#ef4444',
+                                                    confirmButtonText: 'Ya, Hapus!'
+                                                });
+                                                if (result.isConfirmed) {
+                                                    await axios.delete(`/api/members/${member.id}`);
+                                                    window.Swal.fire('Terhapus!', 'Data telah dihapus.', 'success');
+                                                    fetchMembers();
+                                                }
+                                            }} 
+                                            className="btn btn-danger btn-sm" 
+                                            style={{ padding: '5px', display: 'flex', alignItems: 'center' }}
+                                            title="Hapus"
+                                        >
+                                            <Trash2 size={14} />
                                         </button>
                                     </td>
                                 </tr>
@@ -848,7 +1036,7 @@ const App = () => {
                     </div>
                 </div>
 
-                <div className="card">
+                <div id="live-preview-section" className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h2>Live Preview</h2>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -914,6 +1102,71 @@ const App = () => {
                     ))}
                 </div>
             </div>
+            {/* Preview Modal Overlay */}
+            {previewMember && (
+                <div style={{ 
+                    position: 'fixed', 
+                    inset: 0, 
+                    background: 'rgba(0,0,0,0.85)', 
+                    zIndex: 9999, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(5px)',
+                    padding: '20px'
+                }} onClick={() => setPreviewMember(null)}>
+                    <div style={{ 
+                        background: '#f8fafc', 
+                        padding: '2rem', 
+                        borderRadius: '16px', 
+                        maxWidth: '900px', 
+                        width: '100%', 
+                        position: 'relative',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                        overflowY: 'auto',
+                        maxHeight: '90vh'
+                    }} onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={() => setPreviewMember(null)}
+                            style={{ position: 'absolute', top: '15px', right: '15px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            &times;
+                        </button>
+                        
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <h2 style={{ margin: 0, color: '#1e293b' }}>Preview Kartu Anggota</h2>
+                            <p style={{ margin: '5px 0', color: '#64748b' }}>{previewMember.nama} ({previewMember.no_anggota})</p>
+                        </div>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', marginBottom: '2rem' }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '0.9rem' }}>SISI DEPAN</p>
+                                <div id={`modal-front-${previewMember.id}`}>
+                                    <IDCard member={previewMember} logoLeft={logoLeft} logoRight={logoRight} headerText={headerText} validityText={validityText} layout={layout} primaryColor={primaryColor} bgImage={bgFront} />
+                                </div>
+                                <button onClick={() => handleExportImage('front', previewMember.id)} className="btn" style={{ marginTop: '15px', background: '#0891b2', color: 'white' }}>
+                                    <Download size={16} /> Download JPG
+                                </button>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '0.9rem' }}>SISI BELAKANG</p>
+                                <div id={`modal-back-${previewMember.id}`}>
+                                    <IDCard isBack={true} bgImage={bgBack} primaryColor={primaryColor} backText={backText} layout={layout} />
+                                </div>
+                                <button onClick={() => handleExportImage('back', previewMember.id)} className="btn" style={{ marginTop: '15px', background: '#0891b2', color: 'white' }}>
+                                    <Download size={16} /> Download JPG
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'center' }}>
+                            <button className="btn" onClick={() => setPreviewMember(null)} style={{ background: '#64748b', color: 'white', padding: '0.8rem 2.5rem' }}>
+                                Tutup Preview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
