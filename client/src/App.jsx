@@ -222,10 +222,20 @@ const App = () => {
         try {
             const res = await axios.post('/api/upload-logo', formData);
             const url = `http://localhost:5000${res.data.url}`;
-            if (side === 'left') setLogoLeft(url);
-            else if (side === 'right') setLogoRight(url);
-            else if (side === 'bgFront') setBgFront(url);
-            else if (side === 'bgBack') setBgBack(url);
+            
+            if (side === 'left') {
+                setLogoLeft(url);
+                localStorage.setItem('idcard_logoLeft', url);
+            } else if (side === 'right') {
+                setLogoRight(url);
+                localStorage.setItem('idcard_logoRight', url);
+            } else if (side === 'bgFront') {
+                setBgFront(url);
+                localStorage.setItem('idcard_bgFront', url);
+            } else if (side === 'bgBack') {
+                setBgBack(url);
+                localStorage.setItem('idcard_bgBack', url);
+            }
         } catch (err) {
             alert('Failed to upload image: ' + (err.response?.data || err.message));
             console.error(err);
@@ -261,9 +271,26 @@ const App = () => {
         }
     };
 
-    const handlePrint = useReactToPrint({
+    const handlePrintAction = useReactToPrint({
         content: () => componentRef.current,
     });
+
+    const handlePrint = () => {
+        if (selectedMembers.length === 0) {
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'Data Belum Dipilih',
+                    text: 'Mohon centang minimal satu anggota di tabel sebelum mencetak.',
+                    icon: 'warning',
+                    confirmButtonColor: '#6366f1'
+                });
+            } else {
+                alert('Pilih data anggota terlebih dahulu!');
+            }
+            return;
+        }
+        handlePrintAction();
+    };
 
     const saveSettings = () => {
         localStorage.setItem('idcard_headerText', JSON.stringify(headerText));
@@ -332,7 +359,19 @@ const App = () => {
     };
 
     const handleDirectExportPDF = async () => {
-        if (selectedMembers.length === 0) return alert('Pilih data anggota terlebih dahulu!');
+        if (selectedMembers.length === 0) {
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'Data Belum Dipilih',
+                    text: 'Mohon centang minimal satu anggota di tabel untuk diekspor ke PDF.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0891b2'
+                });
+            } else {
+                alert('Pilih data anggota terlebih dahulu!');
+            }
+            return;
+        }
         
         const btn = document.getElementById('btn-export-pdf');
         const originalText = btn.innerHTML;
@@ -365,17 +404,22 @@ const App = () => {
             printArea.parentElement.style.top = '0';
 
             for (let i = 0; i < pages.length; i++) {
+                btn.innerHTML = `<span class="spinner"></span> Memproses Halaman ${i + 1}/${pages.length}...`;
+                
                 if (i > 0) doc.addPage([470, 310], 'landscape');
                 
                 const canvas = await window.html2canvas(pages[i], {
-                    scale: 2, // High resolution
+                    scale: 3.125, // Exactly 300 DPI
                     useCORS: true,
                     logging: false,
                     backgroundColor: '#ffffff'
                 });
                 
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 doc.addImage(imgData, 'JPEG', 0, 0, 470, 310);
+                
+                // Small delay to let UI breath
+                await new Promise(r => setTimeout(r, 100));
             }
 
             // Restore print area
@@ -383,8 +427,12 @@ const App = () => {
             printArea.parentElement.style.position = '';
             printArea.parentElement.style.left = '';
 
-            doc.save(`ID_CARDS_${new Date().getTime()}.pdf`);
-            alert('PDF Berhasil didownload!');
+            doc.save(`ID_CARDS_PRODUKSI_${new Date().getTime()}.pdf`);
+            if (window.Swal) {
+                window.Swal.fire('Berhasil!', 'PDF Produksi 300 DPI telah siap.', 'success');
+            } else {
+                alert('PDF Berhasil didownload!');
+            }
         } catch (err) {
             console.error(err);
             alert('Gagal mengekspor PDF: ' + err.message);
@@ -414,37 +462,37 @@ const App = () => {
 
             if (!frontEl || !backEl) return alert('Elemen kartu tidak lengkap! Mohon pastikan preview depan & belakang terlihat.');
 
-            const frontCanvas = await window.html2canvas(frontEl, { scale: 3, useCORS: true });
-            const backCanvas = await window.html2canvas(backEl, { scale: 3, useCORS: true });
+            const frontCanvas = await window.html2canvas(frontEl, { scale: 5, useCORS: true });
+            const backCanvas = await window.html2canvas(backEl, { scale: 5, useCORS: true });
 
-            // 1. Setup Mockup Canvas (Large size for 2 cards + Header)
+            // 1. Setup Mockup Canvas (Super High Res 2400x2400)
             const mockupCanvas = document.createElement('canvas');
             const ctx = mockupCanvas.getContext('2d');
-            mockupCanvas.width = 1600;
-            mockupCanvas.height = 1600;
+            mockupCanvas.width = 2400;
+            mockupCanvas.height = 2400;
 
             // 2. Draw Realistic Background (Desk Texture)
-            const grad = ctx.createLinearGradient(0, 0, 0, 1600);
+            const grad = ctx.createLinearGradient(0, 0, 0, 2400);
             grad.addColorStop(0, '#ffffff');
             grad.addColorStop(0.2, '#f8fafc');
             grad.addColorStop(1, '#e2e8f0');
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 1600, 1600);
+            ctx.fillRect(0, 0, 2400, 2400);
             
             // Subtle texture/lines
             ctx.strokeStyle = 'rgba(0,0,0,0.03)';
-            for(let i=0; i<1600; i+=20) {
-                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1600, i); ctx.stroke();
+            for(let i=0; i<2400; i+=30) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(2400, i); ctx.stroke();
             }
 
             // 3. Draw BRANDED HEADER
             ctx.textAlign = 'center';
-            ctx.fillStyle = '#64748b'; ctx.font = 'bold 35px Inter, sans-serif'; ctx.fillText('MOCKUP KARTU', 800, 100);
-            ctx.fillStyle = '#1e293b'; ctx.font = '900 85px Inter, sans-serif'; ctx.fillText('ABADI JAYA', 800, 200);
-            ctx.fillStyle = '#334155'; ctx.font = 'bold 38px Inter, sans-serif'; ctx.fillText('Fotocopy, ATK, Digital Print, & Percetakan', 800, 265);
-            ctx.fillStyle = '#475569'; ctx.font = '32px Inter, sans-serif'; ctx.fillText('Desa Kediren kec. Lembeyan - Magetan | WA / 085655620979', 800, 320);
+            ctx.fillStyle = '#64748b'; ctx.font = 'bold 50px Inter, sans-serif'; ctx.fillText('MOCKUP KARTU', 1200, 150);
+            ctx.fillStyle = '#1e293b'; ctx.font = '900 120px Inter, sans-serif'; ctx.fillText('ABADI JAYA', 1200, 300);
+            ctx.fillStyle = '#334155'; ctx.font = 'bold 55px Inter, sans-serif'; ctx.fillText('Fotocopy, ATK, Digital Print, & Percetakan', 1200, 400);
+            ctx.fillStyle = '#475569'; ctx.font = '45px Inter, sans-serif'; ctx.fillText('Desa Kediren kec. Lembeyan - Magetan | WA / 085655620979', 1200, 480);
             
-            ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 2; ctx.moveTo(200, 380); ctx.lineTo(1400, 380); ctx.stroke();
+            ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 3; ctx.moveTo(300, 560); ctx.lineTo(2100, 560); ctx.stroke();
 
             // 4. FUNCTION TO DRAW ROUNDED CARD WITH SHADOW
             const drawRoundedCard = (srcCanvas, x, y, rotation, scale = 1) => {
@@ -457,11 +505,11 @@ const App = () => {
                 ctx.rotate(rotation);
                 
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 40;
-                ctx.shadowOffsetX = 15;
-                ctx.shadowOffsetY = 20;
+                ctx.shadowBlur = 60;
+                ctx.shadowOffsetX = 20;
+                ctx.shadowOffsetY = 30;
 
-                const radius = 40 * scale;
+                const radius = 60 * scale; // Larger radius for high res
                 ctx.beginPath();
                 ctx.moveTo(-w/2 + radius, -h/2);
                 ctx.lineTo(w/2 - radius, -h/2);
@@ -479,23 +527,30 @@ const App = () => {
                 ctx.restore();
             };
 
-            // 5. DRAW THE STACK
-            drawRoundedCard(backCanvas, 900, 1000, Math.PI / 12, 0.9); 
-            drawRoundedCard(frontCanvas, 750, 950, 0, 1.0);
+            // 5. DRAW THE STACK BASED ON SELECTED SIDE
+            if (side === 'back') {
+                // Back side on TOP and STRAIGHT
+                drawRoundedCard(frontCanvas, 1350, 1500, Math.PI / 12, 1.0); 
+                drawRoundedCard(backCanvas, 1100, 1400, 0, 1.15);
+            } else {
+                // Front side on TOP and STRAIGHT (Default)
+                drawRoundedCard(backCanvas, 1350, 1500, Math.PI / 12, 1.0); 
+                drawRoundedCard(frontCanvas, 1100, 1400, 0, 1.15);
+            }
 
             // 6. WATERMARK (Top Layer)
             ctx.save();
-            ctx.translate(800, 950);
+            ctx.translate(1200, 1400);
             ctx.rotate(-Math.PI / 6);
-            ctx.font = 'bold 120px Arial';
+            ctx.font = 'bold 180px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.textAlign = 'center';
             ctx.fillText('ABADI JAYA COPIER', 0, 0);
             ctx.restore();
 
             const link = document.createElement('a');
-            link.download = `PREMIUM_MOCKUP_${safeName}.jpg`;
-            link.href = mockupCanvas.toDataURL('image/jpeg', 0.9);
+            link.download = `PREMIUM_MOCKUP_${side.toUpperCase()}_${safeName}.jpg`;
+            link.href = mockupCanvas.toDataURL('image/jpeg', 1.0);
             link.click();
         } catch (err) {
             console.error(err);
@@ -727,11 +782,11 @@ const App = () => {
                 </div>
 
                 <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <button id="btn-export-pdf" className="btn btn-primary" onClick={handleDirectExportPDF} disabled={selectedMembers.length === 0} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#0891b2' }}>
+                    <button id="btn-export-pdf" className="btn btn-primary" onClick={handleDirectExportPDF} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#0891b2' }}>
                         <FileText size={20} />
                         Download PDF (Otomatis)
                     </button>
-                    <button className="btn btn-primary" onClick={handlePrint} disabled={selectedMembers.length === 0} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#6366f1' }}>
+                    <button className="btn btn-primary" onClick={handlePrint} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#6366f1' }}>
                         <Printer size={20} />
                         Cetak Manual (Browser)
                     </button>
