@@ -684,27 +684,37 @@ const App = () => {
                                             onClick={async () => {
                                                 if (!window.Swal) return;
                                                 const { value: formValues } = await window.Swal.fire({
-                                                    title: 'Edit Data Anggota',
+                                                    title: '<span style="font-weight: 800; color: #1e293b;">Edit Data Anggota</span>',
                                                     html:
-                                                        `<div style="text-align: left; padding: 0 10px;">` +
-                                                        `<label style="display:block; margin-bottom:5px; font-weight:bold; font-size:0.9rem;">Nomor Anggota</label>` +
-                                                        `<input id="swal-no" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="No. Anggota" value="${member.no_anggota}">` +
-                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Nama Lengkap</label>` +
-                                                        `<input id="swal-nama" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Nama" value="${member.nama}">` +
-                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Alamat</label>` +
-                                                        `<input id="swal-alamat" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Alamat" value="${member.alamat}">` +
-                                                        `<label style="display:block; margin:15px 0 5px 0; font-weight:bold; font-size:0.9rem;">Unit / Instansi</label>` +
-                                                        `<input id="swal-unit" class="swal2-input" style="margin-top:0; width:100%; box-sizing:border-box;" placeholder="Unit" value="${member.unit}">` +
+                                                        `<div style="text-align: left; padding: 10px 5px; font-family: \'Outfit\', sans-serif;">` +
+                                                        `<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px;">` +
+                                                        `<div><label style="display:block; margin-bottom:5px; font-weight:700; font-size:0.8rem; color:#64748b; text-transform:uppercase;">No. Anggota</label>` +
+                                                        `<input id="swal-no" class="swal2-input" style="margin:0; width:100%; height:45px; font-size:0.95rem; border-radius:8px;" placeholder="No" value="${member.no_anggota}"></div>` +
+                                                        `<div><label style="display:block; margin-bottom:5px; font-weight:700; font-size:0.8rem; color:#64748b; text-transform:uppercase;">Nama Lengkap</label>` +
+                                                        `<input id="swal-nama" class="swal2-input" style="margin:0; width:100%; height:45px; font-size:0.95rem; border-radius:8px;" placeholder="Nama" value="${member.nama}"></div>` +
+                                                        `</div>` +
+                                                        `<div style="margin-bottom: 15px;"><label style="display:block; margin-bottom:5px; font-weight:700; font-size:0.8rem; color:#64748b; text-transform:uppercase;">Unit / Instansi</label>` +
+                                                        `<input id="swal-unit" class="swal2-input" style="margin:0; width:100%; height:45px; font-size:0.95rem; border-radius:8px;" placeholder="Unit" value="${member.unit}"></div>` +
+                                                        `<div><label style="display:block; margin-bottom:5px; font-weight:700; font-size:0.8rem; color:#64748b; text-transform:uppercase;">Alamat</label>` +
+                                                        `<textarea id="swal-alamat" class="swal2-textarea" style="margin:0; width:100%; height:100px; font-size:0.95rem; border-radius:8px; border:1px solid #d1d5db; padding:12px; font-family:inherit; resize:none; box-sizing:border-box;">${member.alamat}</textarea></div>` +
                                                         `</div>`,
-                                                    width: '500px',
+                                                    width: '550px',
+                                                    showCancelButton: true,
+                                                    cancelButtonText: 'Batal',
+                                                    confirmButtonText: 'Simpan Perubahan',
+                                                    confirmButtonColor: '#6366f1',
+                                                    cancelButtonColor: '#94a3b8',
                                                     focusConfirm: false,
                                                     preConfirm: () => {
-                                                        return {
-                                                            no_anggota: document.getElementById('swal-no').value,
-                                                            nama: document.getElementById('swal-nama').value,
-                                                            alamat: document.getElementById('swal-alamat').value,
-                                                            unit: document.getElementById('swal-unit').value
+                                                        const no = document.getElementById('swal-no').value;
+                                                        const nama = document.getElementById('swal-nama').value;
+                                                        const alamat = document.getElementById('swal-alamat').value;
+                                                        const unit = document.getElementById('swal-unit').value;
+                                                        if (!no || !nama) {
+                                                            window.Swal.showValidationMessage('Nomor dan Nama wajib diisi');
+                                                            return false;
                                                         }
+                                                        return { no_anggota: no, nama, alamat, unit };
                                                     }
                                                 });
                                                 if (formValues) {
