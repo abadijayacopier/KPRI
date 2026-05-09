@@ -1133,6 +1133,25 @@ const App = () => {
                 </div>
             </main>
 
+            <footer className="no-print" style={{ 
+                textAlign: 'center', 
+                padding: '2rem 1rem', 
+                marginTop: '2rem', 
+                color: '#64748b', 
+                borderTop: '1px solid #e2e8f0',
+                fontSize: '0.9rem'
+            }}>
+                <p style={{ margin: 0 }}>
+                    &copy; {new Date().getFullYear()} ID Card Studio - Premium Edition
+                </p>
+                <p style={{ margin: '5px 0', fontWeight: '500' }}>
+                    Developed by <span style={{ color: '#1e293b', fontWeight: 'bold' }}>Supriyanto</span> - 085655620979
+                </p>
+                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>
+                    Developer Software @Magetan - Jawa Timur
+                </p>
+            </footer>
+
             {/* Hidden Print Area */}
             <div style={{ display: 'none' }}>
                 <div ref={componentRef} className="print-area">
