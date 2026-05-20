@@ -181,8 +181,8 @@ const App = () => {
 
     // Filter Logic
     const filteredMembers = members.filter(m => {
-        const matchesSearch = m.nama.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             m.no_anggota.toString().includes(searchTerm);
+        const matchesSearch = m.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            m.no_anggota.toString().includes(searchTerm);
         const matchesUnit = filterUnit === '' || m.unit === filterUnit;
         return matchesSearch && matchesUnit;
     });
@@ -222,7 +222,7 @@ const App = () => {
         try {
             const res = await axios.post('/api/upload-logo', formData);
             const url = `http://localhost:5000${res.data.url}`;
-            
+
             if (side === 'left') {
                 setLogoLeft(url);
                 localStorage.setItem('idcard_logoLeft', url);
@@ -372,7 +372,7 @@ const App = () => {
             }
             return;
         }
-        
+
         const btn = document.getElementById('btn-export-pdf');
         const originalText = btn.innerHTML;
         btn.innerHTML = 'Memproses PDF... Mohon Tunggu...';
@@ -395,7 +395,7 @@ const App = () => {
 
             const printArea = componentRef.current;
             const pages = printArea.querySelectorAll('.print-media-a3plus');
-            
+
             // Temporarily show print area for capture
             const originalDisplay = printArea.parentElement.style.display;
             printArea.parentElement.style.display = 'block';
@@ -405,19 +405,19 @@ const App = () => {
 
             for (let i = 0; i < pages.length; i++) {
                 btn.innerHTML = `<span class="spinner"></span> Memproses Halaman ${i + 1}/${pages.length}...`;
-                
+
                 if (i > 0) doc.addPage([470, 310], 'landscape');
-                
+
                 const canvas = await window.html2canvas(pages[i], {
                     scale: 3.125, // Exactly 300 DPI
                     useCORS: true,
                     logging: false,
                     backgroundColor: '#ffffff'
                 });
-                
+
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 doc.addImage(imgData, 'JPEG', 0, 0, 470, 310);
-                
+
                 // Small delay to let UI breath
                 await new Promise(r => setTimeout(r, 100));
             }
@@ -478,10 +478,10 @@ const App = () => {
             grad.addColorStop(1, '#e2e8f0');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 2400, 2400);
-            
+
             // Subtle texture/lines
             ctx.strokeStyle = 'rgba(0,0,0,0.03)';
-            for(let i=0; i<2400; i+=30) {
+            for (let i = 0; i < 2400; i += 30) {
                 ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(2400, i); ctx.stroke();
             }
 
@@ -491,7 +491,7 @@ const App = () => {
             ctx.fillStyle = '#1e293b'; ctx.font = '900 120px Inter, sans-serif'; ctx.fillText('ABADI JAYA', 1200, 300);
             ctx.fillStyle = '#334155'; ctx.font = 'bold 55px Inter, sans-serif'; ctx.fillText('Fotocopy, ATK, Digital Print, & Percetakan', 1200, 400);
             ctx.fillStyle = '#475569'; ctx.font = '45px Inter, sans-serif'; ctx.fillText('Desa Kediren kec. Lembeyan - Magetan | WA / 085655620979', 1200, 480);
-            
+
             ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 3; ctx.moveTo(300, 560); ctx.lineTo(2100, 560); ctx.stroke();
 
             // 4. FUNCTION TO DRAW ROUNDED CARD WITH SHADOW
@@ -503,7 +503,7 @@ const App = () => {
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(rotation);
-                
+
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 60;
                 ctx.shadowOffsetX = 20;
@@ -511,30 +511,30 @@ const App = () => {
 
                 const radius = 60 * scale; // Larger radius for high res
                 ctx.beginPath();
-                ctx.moveTo(-w/2 + radius, -h/2);
-                ctx.lineTo(w/2 - radius, -h/2);
-                ctx.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + radius);
-                ctx.lineTo(w/2, h/2 - radius);
-                ctx.quadraticCurveTo(w/2, h/2, w/2 - radius, h/2);
-                ctx.lineTo(-w/2 + radius, h/2);
-                ctx.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - radius);
-                ctx.lineTo(-w/2, -h/2 + radius);
-                ctx.quadraticCurveTo(-w/2, -h/2, -w/2 + radius, -h/2);
+                ctx.moveTo(-w / 2 + radius, -h / 2);
+                ctx.lineTo(w / 2 - radius, -h / 2);
+                ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
+                ctx.lineTo(w / 2, h / 2 - radius);
+                ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
+                ctx.lineTo(-w / 2 + radius, h / 2);
+                ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
+                ctx.lineTo(-w / 2, -h / 2 + radius);
+                ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
                 ctx.closePath();
                 ctx.clip();
 
-                ctx.drawImage(srcCanvas, off, off, srcCanvas.width - off*2, srcCanvas.height - off*2, -w/2, -h/2, w, h);
+                ctx.drawImage(srcCanvas, off, off, srcCanvas.width - off * 2, srcCanvas.height - off * 2, -w / 2, -h / 2, w, h);
                 ctx.restore();
             };
 
             // 5. DRAW THE STACK BASED ON SELECTED SIDE
             if (side === 'back') {
                 // Back side on TOP and STRAIGHT
-                drawRoundedCard(frontCanvas, 1350, 1500, Math.PI / 12, 1.0); 
+                drawRoundedCard(frontCanvas, 1350, 1500, Math.PI / 12, 1.0);
                 drawRoundedCard(backCanvas, 1100, 1400, 0, 1.15);
             } else {
                 // Front side on TOP and STRAIGHT (Default)
-                drawRoundedCard(backCanvas, 1350, 1500, Math.PI / 12, 1.0); 
+                drawRoundedCard(backCanvas, 1350, 1500, Math.PI / 12, 1.0);
                 drawRoundedCard(frontCanvas, 1100, 1400, 0, 1.15);
             }
 
@@ -619,14 +619,14 @@ const App = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h2><Users size={20} /> Data Anggota ({filteredMembers.length})</h2>
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <input 
-                                type="text" 
-                                placeholder="Cari nama / nomor..." 
+                            <input
+                                type="text"
+                                placeholder="Cari nama / nomor..."
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                                 style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #ddd', width: '200px' }}
                             />
-                            <select 
+                            <select
                                 value={filterUnit}
                                 onChange={(e) => { setFilterUnit(e.target.value); setCurrentPage(1); }}
                                 style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #ddd' }}
@@ -638,13 +638,13 @@ const App = () => {
                             </select>
                         </div>
                     </div>
-                    
+
                     <table className="member-list">
                         <thead>
                             <tr>
                                 <th>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={filteredMembers.length > 0 && selectedMembers.length === filteredMembers.length}
                                         onChange={toggleSelectAll}
                                     />
@@ -661,8 +661,8 @@ const App = () => {
                             {paginatedMembers.map(member => (
                                 <tr key={member.id}>
                                     <td>
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             checked={!!selectedMembers.find(m => m.id === member.id)}
                                             onChange={() => toggleSelect(member)}
                                         />
@@ -672,15 +672,15 @@ const App = () => {
                                     <td>{member.alamat}</td>
                                     <td>{member.unit}</td>
                                     <td style={{ display: 'flex', gap: '5px' }}>
-                                        <button 
-                                            onClick={() => setPreviewMember(member)} 
-                                            className="btn btn-sm" 
+                                        <button
+                                            onClick={() => setPreviewMember(member)}
+                                            className="btn btn-sm"
                                             style={{ background: '#6366f1', color: 'white', padding: '5px', display: 'flex', alignItems: 'center' }}
                                             title="Preview"
                                         >
                                             <Eye size={14} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={async () => {
                                                 if (!window.Swal) return;
                                                 const { value: formValues } = await window.Swal.fire({
@@ -733,14 +733,14 @@ const App = () => {
                                                         window.Swal.fire('Error', 'Gagal memperbarui data', 'error');
                                                     }
                                                 }
-                                            }} 
-                                            className="btn btn-sm" 
+                                            }}
+                                            className="btn btn-sm"
                                             style={{ background: '#f59e0b', color: 'white', padding: '5px', display: 'flex', alignItems: 'center' }}
                                             title="Edit"
                                         >
                                             <Edit2 size={14} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={async () => {
                                                 if (!window.Swal) return;
                                                 const result = await window.Swal.fire({
@@ -756,8 +756,8 @@ const App = () => {
                                                     window.Swal.fire('Terhapus!', 'Data telah dihapus.', 'success');
                                                     fetchMembers();
                                                 }
-                                            }} 
-                                            className="btn btn-danger btn-sm" 
+                                            }}
+                                            className="btn btn-danger btn-sm"
                                             style={{ padding: '5px', display: 'flex', alignItems: 'center' }}
                                             title="Hapus"
                                         >
@@ -771,8 +771,8 @@ const App = () => {
 
                     {/* Pagination Controls */}
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button 
-                            className="btn" 
+                        <button
+                            className="btn"
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(currentPage - 1)}
                             style={{ background: '#f1f5f9' }}
@@ -780,8 +780,8 @@ const App = () => {
                             Previous
                         </button>
                         <span>Page {currentPage} of {totalPages || 1}</span>
-                        <button 
-                            className="btn" 
+                        <button
+                            className="btn"
                             disabled={currentPage === totalPages || totalPages === 0}
                             onClick={() => setCurrentPage(currentPage + 1)}
                             style={{ background: '#f1f5f9' }}
@@ -801,11 +801,11 @@ const App = () => {
                         Cetak Manual (Browser)
                     </button>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginLeft: '1rem' }}>
-                        <input 
-                            type="checkbox" 
-                            id="backOnce" 
-                            checked={printBackOnce} 
-                            onChange={(e) => setPrintBackOnce(e.target.checked)} 
+                        <input
+                            type="checkbox"
+                            id="backOnce"
+                            checked={printBackOnce}
+                            onChange={(e) => setPrintBackOnce(e.target.checked)}
                             style={{ width: '20px', height: '20px', cursor: 'pointer' }}
                         />
                         <label htmlFor="backOnce" style={{ fontWeight: 'bold', cursor: 'pointer', color: '#475569' }}>Hanya Cetak 1 Halaman Belakang (Efisien)</label>
@@ -830,16 +830,16 @@ const App = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <h3>Kop Kartu (Header)</h3>
-                            <input type="text" placeholder="Baris 1" value={headerText.line1} onChange={(e) => setHeaderText({...headerText, line1: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <input type="text" placeholder="Baris 2 (Nama Koperasi)" value={headerText.line2} onChange={(e) => setHeaderText({...headerText, line2: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd', fontWeight: 'bold' }} />
-                            <input type="text" placeholder="Baris 3" value={headerText.line3} onChange={(e) => setHeaderText({...headerText, line3: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
-                            <input type="text" placeholder="Baris 4" value={headerText.line4} onChange={(e) => setHeaderText({...headerText, line4: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                            <input type="text" placeholder="Baris 1" value={headerText.line1} onChange={(e) => setHeaderText({ ...headerText, line1: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                            <input type="text" placeholder="Baris 2 (Nama Koperasi)" value={headerText.line2} onChange={(e) => setHeaderText({ ...headerText, line2: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd', fontWeight: 'bold' }} />
+                            <input type="text" placeholder="Baris 3" value={headerText.line3} onChange={(e) => setHeaderText({ ...headerText, line3: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                            <input type="text" placeholder="Baris 4" value={headerText.line4} onChange={(e) => setHeaderText({ ...headerText, line4: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <h3>Masa Berlaku & Warna</h3>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <span style={{ whiteSpace: 'nowrap' }}>Judul Kartu : </span>
-                                <input type="text" value={headerText.cardTitle} onChange={(e) => setHeaderText({...headerText, cardTitle: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd', width: '100%' }} />
+                                <input type="text" value={headerText.cardTitle} onChange={(e) => setHeaderText({ ...headerText, cardTitle: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd', width: '100%' }} />
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <span style={{ whiteSpace: 'nowrap' }}>Masa Berlaku : </span>
@@ -896,167 +896,167 @@ const App = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                         <div className="control-group">
                             <label>Tinggi Header (mm)</label>
-                            <input type="range" min="15" max="40" step="0.5" value={layout.headerHeight} onChange={(e) => setLayout({...layout, headerHeight: parseFloat(e.target.value)})} />
+                            <input type="range" min="15" max="40" step="0.5" value={layout.headerHeight} onChange={(e) => setLayout({ ...layout, headerHeight: parseFloat(e.target.value) })} />
                             <span>{layout.headerHeight} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Posisi Atas Konten (mm)</label>
-                            <input type="range" min="15" max="40" step="0.5" value={layout.bodyTop} onChange={(e) => setLayout({...layout, bodyTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="15" max="40" step="0.5" value={layout.bodyTop} onChange={(e) => setLayout({ ...layout, bodyTop: parseFloat(e.target.value) })} />
                             <span>{layout.bodyTop} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Kiri (mm)</label>
-                            <input type="range" min="0" max="15" step="0.5" value={layout.bodyLeft} onChange={(e) => setLayout({...layout, bodyLeft: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="15" step="0.5" value={layout.bodyLeft} onChange={(e) => setLayout({ ...layout, bodyLeft: parseFloat(e.target.value) })} />
                             <span>{layout.bodyLeft} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Posisi Masa Berlaku (mm)</label>
-                            <input type="range" min="40" max="58" step="0.5" value={layout.footerTop} onChange={(e) => setLayout({...layout, footerTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="40" max="58" step="0.5" value={layout.footerTop} onChange={(e) => setLayout({ ...layout, footerTop: parseFloat(e.target.value) })} />
                             <span>{layout.footerTop} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Posisi QR (Atas - mm)</label>
-                            <input type="range" min="20" max="55" step="0.5" value={layout.qrTop} onChange={(e) => setLayout({...layout, qrTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="20" max="55" step="0.5" value={layout.qrTop} onChange={(e) => setLayout({ ...layout, qrTop: parseFloat(e.target.value) })} />
                             <span>{layout.qrTop} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Posisi QR (Kanan - mm)</label>
-                            <input type="range" min="0" max="20" step="0.5" value={layout.qrRight} onChange={(e) => setLayout({...layout, qrRight: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="20" step="0.5" value={layout.qrRight} onChange={(e) => setLayout({ ...layout, qrRight: parseFloat(e.target.value) })} />
                             <span>{layout.qrRight} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Ukuran QR (px)</label>
-                            <input type="range" min="30" max="80" step="1" value={layout.qrSize} onChange={(e) => setLayout({...layout, qrSize: parseInt(e.target.value)})} />
+                            <input type="range" min="30" max="80" step="1" value={layout.qrSize} onChange={(e) => setLayout({ ...layout, qrSize: parseInt(e.target.value) })} />
                             <span>{layout.qrSize} px</span>
                         </div>
                         <div className="control-group">
                             <label>Ukuran Logo Kiri (mm)</label>
-                            <input type="range" min="5" max="30" step="0.5" value={layout.logoLeftSize} onChange={(e) => setLayout({...layout, logoLeftSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="30" step="0.5" value={layout.logoLeftSize} onChange={(e) => setLayout({ ...layout, logoLeftSize: parseFloat(e.target.value) })} />
                             <span>{layout.logoLeftSize} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Ukuran Logo Kanan (mm)</label>
-                            <input type="range" min="5" max="40" step="0.5" value={layout.logoRightSize} onChange={(e) => setLayout({...layout, logoRightSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="40" step="0.5" value={layout.logoRightSize} onChange={(e) => setLayout({ ...layout, logoRightSize: parseFloat(e.target.value) })} />
                             <span>{layout.logoRightSize} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Kanan Isi (mm)</label>
-                            <input type="range" min="0" max="15" step="0.5" value={layout.bodyRight} onChange={(e) => setLayout({...layout, bodyRight: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="15" step="0.5" value={layout.bodyRight} onChange={(e) => setLayout({ ...layout, bodyRight: parseFloat(e.target.value) })} />
                             <span>{layout.bodyRight} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Jarak Baris (mm)</label>
-                            <input type="range" min="0" max="5" step="0.1" value={layout.lineSpacing} onChange={(e) => setLayout({...layout, lineSpacing: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="5" step="0.1" value={layout.lineSpacing} onChange={(e) => setLayout({ ...layout, lineSpacing: parseFloat(e.target.value) })} />
                             <span>{layout.lineSpacing} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Atas Logo Kiri (mm)</label>
-                            <input type="range" min="0" max="10" step="0.5" value={layout.headerLogoTopLeft} onChange={(e) => setLayout({...layout, headerLogoTopLeft: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="10" step="0.5" value={layout.headerLogoTopLeft} onChange={(e) => setLayout({ ...layout, headerLogoTopLeft: parseFloat(e.target.value) })} />
                             <span>{layout.headerLogoTopLeft} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Atas Logo Kanan (mm)</label>
-                            <input type="range" min="0" max="10" step="0.5" value={layout.headerLogoTopRight} onChange={(e) => setLayout({...layout, headerLogoTopRight: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="10" step="0.5" value={layout.headerLogoTopRight} onChange={(e) => setLayout({ ...layout, headerLogoTopRight: parseFloat(e.target.value) })} />
                             <span>{layout.headerLogoTopRight} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Kiri Logo Kiri (mm)</label>
-                            <input type="range" min="0" max="20" step="0.5" value={layout.headerLogoLeft} onChange={(e) => setLayout({...layout, headerLogoLeft: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="20" step="0.5" value={layout.headerLogoLeft} onChange={(e) => setLayout({ ...layout, headerLogoLeft: parseFloat(e.target.value) })} />
                             <span>{layout.headerLogoLeft} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Kanan Logo Kanan (mm)</label>
-                            <input type="range" min="0" max="20" step="0.5" value={layout.headerLogoRight} onChange={(e) => setLayout({...layout, headerLogoRight: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="20" step="0.5" value={layout.headerLogoRight} onChange={(e) => setLayout({ ...layout, headerLogoRight: parseFloat(e.target.value) })} />
                             <span>{layout.headerLogoRight} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Font Header (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.headerFontSize} onChange={(e) => setLayout({...layout, headerFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.headerFontSize} onChange={(e) => setLayout({ ...layout, headerFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.headerFontSize} pt</span>
                         </div>
                         <div className="control-group">
                             <label>Font Judul Kartu (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.titleFontSize} onChange={(e) => setLayout({...layout, titleFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.titleFontSize} onChange={(e) => setLayout({ ...layout, titleFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.titleFontSize} pt</span>
                         </div>
                         <div className="control-group">
                             <label>Font Data Anggota (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.bodyFontSize} onChange={(e) => setLayout({...layout, bodyFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.bodyFontSize} onChange={(e) => setLayout({ ...layout, bodyFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.bodyFontSize} pt</span>
                         </div>
                         <div className="control-group">
                             <label>Font Masa Berlaku (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.footerFontSize} onChange={(e) => setLayout({...layout, footerFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.footerFontSize} onChange={(e) => setLayout({ ...layout, footerFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.footerFontSize} pt</span>
                         </div>
                         <div className="control-group">
                             <label>Posisi Masa Berlaku (Kiri - mm)</label>
-                            <input type="range" min="0" max="60" step="0.5" value={layout.footerLeft} onChange={(e) => setLayout({...layout, footerLeft: parseFloat(e.target.value)})} />
+                            <input type="range" min="0" max="60" step="0.5" value={layout.footerLeft} onChange={(e) => setLayout({ ...layout, footerLeft: parseFloat(e.target.value) })} />
                             <span>{layout.footerLeft} mm</span>
                         </div>
                         <div className="control-group">
                             <label>Margin Atas Teks Kop (mm)</label>
-                            <input type="range" min="-5" max="15" step="0.5" value={layout.headerTextTop} onChange={(e) => setLayout({...layout, headerTextTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="-5" max="15" step="0.5" value={layout.headerTextTop} onChange={(e) => setLayout({ ...layout, headerTextTop: parseFloat(e.target.value) })} />
                             <span>{layout.headerTextTop} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#f0f9ff', padding: '10px', borderRadius: '4px', border: '1px solid #bae6fd' }}>
                             <label style={{ fontWeight: 'bold', color: '#0369a1' }}>Lebar Label Data (mm) - [Geser untuk luruskan Titik Dua]</label>
-                            <input type="range" min="15" max="50" step="0.5" value={layout.labelWidth} onChange={(e) => setLayout({...layout, labelWidth: parseFloat(e.target.value)})} />
+                            <input type="range" min="15" max="50" step="0.5" value={layout.labelWidth} onChange={(e) => setLayout({ ...layout, labelWidth: parseFloat(e.target.value) })} />
                             <span style={{ fontWeight: 'bold' }}>{layout.labelWidth} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Tinggi Header (mm)</label>
-                            <input type="range" min="5" max="30" step="0.5" value={layout.backHeaderHeight} onChange={(e) => setLayout({...layout, backHeaderHeight: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="30" step="0.5" value={layout.backHeaderHeight} onChange={(e) => setLayout({ ...layout, backHeaderHeight: parseFloat(e.target.value) })} />
                             <span>{layout.backHeaderHeight} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Posisi Judul (mm)</label>
-                            <input type="range" min="5" max="30" step="0.5" value={layout.backTitleTop} onChange={(e) => setLayout({...layout, backTitleTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="30" step="0.5" value={layout.backTitleTop} onChange={(e) => setLayout({ ...layout, backTitleTop: parseFloat(e.target.value) })} />
                             <span>{layout.backTitleTop} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Posisi Aturan (mm)</label>
-                            <input type="range" min="15" max="45" step="0.5" value={layout.backRulesTop} onChange={(e) => setLayout({...layout, backRulesTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="15" max="45" step="0.5" value={layout.backRulesTop} onChange={(e) => setLayout({ ...layout, backRulesTop: parseFloat(e.target.value) })} />
                             <span>{layout.backRulesTop} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Jarak Footer (mm)</label>
-                            <input type="range" min="2" max="15" step="0.5" value={layout.backFooterBottom} onChange={(e) => setLayout({...layout, backFooterBottom: parseFloat(e.target.value)})} />
+                            <input type="range" min="2" max="15" step="0.5" value={layout.backFooterBottom} onChange={(e) => setLayout({ ...layout, backFooterBottom: parseFloat(e.target.value) })} />
                             <span>{layout.backFooterBottom} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Jarak Antar Aturan (mm)</label>
-                            <input type="range" min="0.5" max="5" step="0.1" value={layout.backRuleSpacing} onChange={(e) => setLayout({...layout, backRuleSpacing: parseFloat(e.target.value)})} />
+                            <input type="range" min="0.5" max="5" step="0.1" value={layout.backRuleSpacing} onChange={(e) => setLayout({ ...layout, backRuleSpacing: parseFloat(e.target.value) })} />
                             <span>{layout.backRuleSpacing} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#fff7ed', padding: '10px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
                             <label style={{ fontWeight: 'bold', color: '#9a3412' }}>[BELAKANG] Margin Kiri Aturan (mm)</label>
-                            <input type="range" min="2" max="20" step="0.5" value={layout.backRulesLeft} onChange={(e) => setLayout({...layout, backRulesLeft: parseFloat(e.target.value)})} />
+                            <input type="range" min="2" max="20" step="0.5" value={layout.backRulesLeft} onChange={(e) => setLayout({ ...layout, backRulesLeft: parseFloat(e.target.value) })} />
                             <span>{layout.backRulesLeft} mm</span>
                         </div>
                         <div className="control-group" style={{ background: '#ecfdf5', padding: '10px', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
                             <label style={{ fontWeight: 'bold', color: '#059669' }}>[BELAKANG] Font Header (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.backHeaderFontSize} onChange={(e) => setLayout({...layout, backHeaderFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.backHeaderFontSize} onChange={(e) => setLayout({ ...layout, backHeaderFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.backHeaderFontSize} pt</span>
                         </div>
                         <div className="control-group" style={{ background: '#ecfdf5', padding: '10px', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
                             <label style={{ fontWeight: 'bold', color: '#059669' }}>[BELAKANG] Font Judul (pt)</label>
-                            <input type="range" min="5" max="15" step="0.1" value={layout.backTitleFontSize} onChange={(e) => setLayout({...layout, backTitleFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="5" max="15" step="0.1" value={layout.backTitleFontSize} onChange={(e) => setLayout({ ...layout, backTitleFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.backTitleFontSize} pt</span>
                         </div>
                         <div className="control-group" style={{ background: '#ecfdf5', padding: '10px', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
                             <label style={{ fontWeight: 'bold', color: '#059669' }}>[BELAKANG] Font Aturan (pt)</label>
-                            <input type="range" min="4" max="12" step="0.1" value={layout.backRulesFontSize} onChange={(e) => setLayout({...layout, backRulesFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="4" max="12" step="0.1" value={layout.backRulesFontSize} onChange={(e) => setLayout({ ...layout, backRulesFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.backRulesFontSize} pt</span>
                         </div>
                         <div className="control-group" style={{ background: '#ecfdf5', padding: '10px', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
                             <label style={{ fontWeight: 'bold', color: '#059669' }}>[BELAKANG] Font Footer (pt)</label>
-                            <input type="range" min="4" max="12" step="0.1" value={layout.backFooterFontSize} onChange={(e) => setLayout({...layout, backFooterFontSize: parseFloat(e.target.value)})} />
+                            <input type="range" min="4" max="12" step="0.1" value={layout.backFooterFontSize} onChange={(e) => setLayout({ ...layout, backFooterFontSize: parseFloat(e.target.value) })} />
                             <span>{layout.backFooterFontSize} pt</span>
                         </div>
                         <div className="control-group" style={{ background: '#f0fdf4', padding: '10px', borderRadius: '4px', border: '1px solid #bbf7d0' }}>
                             <label style={{ fontWeight: 'bold', color: '#166534' }}>[BELAKANG] Margin Atas Teks Kop (mm)</label>
-                            <input type="range" min="-5" max="5" step="0.5" value={layout.backHeaderTextTop} onChange={(e) => setLayout({...layout, backHeaderTextTop: parseFloat(e.target.value)})} />
+                            <input type="range" min="-5" max="5" step="0.5" value={layout.backHeaderTextTop} onChange={(e) => setLayout({ ...layout, backHeaderTextTop: parseFloat(e.target.value) })} />
                             <span>{layout.backHeaderTextTop} mm</span>
                         </div>
                     </div>
@@ -1068,15 +1068,15 @@ const App = () => {
                             <h3>Teks Utama Belakang</h3>
                             <div className="control-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label>Header Belakang</label>
-                                <input type="text" className="form-control" value={backText.header} onChange={(e) => setBackText({...backText, header: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                                <input type="text" className="form-control" value={backText.header} onChange={(e) => setBackText({ ...backText, header: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
                             </div>
                             <div className="control-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label>Judul Belakang</label>
-                                <input type="text" className="form-control" value={backText.title} onChange={(e) => setBackText({...backText, title: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                                <input type="text" className="form-control" value={backText.title} onChange={(e) => setBackText({ ...backText, title: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
                             </div>
                             <div className="control-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label>Footer Belakang</label>
-                                <input type="text" className="form-control" value={backText.footer} onChange={(e) => setBackText({...backText, footer: e.target.value})} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                                <input type="text" className="form-control" value={backText.footer} onChange={(e) => setBackText({ ...backText, footer: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }} />
                             </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1084,14 +1084,14 @@ const App = () => {
                             {backText.rules.map((rule, idx) => (
                                 <div key={idx} className="control-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                     <label>Peraturan {idx + 1}</label>
-                                    <textarea 
-                                        className="form-control" 
-                                        rows="2" 
-                                        value={rule} 
+                                    <textarea
+                                        className="form-control"
+                                        rows="2"
+                                        value={rule}
                                         onChange={(e) => {
                                             const newRules = [...backText.rules];
                                             newRules[idx] = e.target.value;
-                                            setBackText({...backText, rules: newRules});
+                                            setBackText({ ...backText, rules: newRules });
                                         }}
                                         style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd', fontFamily: 'inherit' }}
                                     />
@@ -1105,18 +1105,18 @@ const App = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h2>Live Preview</h2>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <button 
-                                className="btn" 
-                                disabled={previewIndex === 0} 
+                            <button
+                                className="btn"
+                                disabled={previewIndex === 0}
                                 onClick={() => setPreviewIndex(previewIndex - 1)}
                                 style={{ padding: '0.3rem 0.8rem', background: '#f1f5f9' }}
                             >
                                 &lt; Prev
                             </button>
                             <span style={{ fontSize: '0.9rem' }}>{previewIndex + 1} / {previewData.length || 1}</span>
-                            <button 
-                                className="btn" 
-                                disabled={previewIndex >= (previewData.length - 1)} 
+                            <button
+                                className="btn"
+                                disabled={previewIndex >= (previewData.length - 1)}
                                 onClick={() => setPreviewIndex(previewIndex + 1)}
                                 style={{ padding: '0.3rem 0.8rem', background: '#f1f5f9' }}
                             >
@@ -1143,11 +1143,11 @@ const App = () => {
                 </div>
             </main>
 
-            <footer className="no-print" style={{ 
-                textAlign: 'center', 
-                padding: '2rem 1rem', 
-                marginTop: '2rem', 
-                color: '#64748b', 
+            <footer className="no-print" style={{
+                textAlign: 'center',
+                padding: '2rem 1rem',
+                marginTop: '2rem',
+                color: '#64748b',
                 borderTop: '1px solid #e2e8f0',
                 fontSize: '0.9rem'
             }}>
@@ -1188,35 +1188,35 @@ const App = () => {
             </div>
             {/* Preview Modal Overlay */}
             {previewMember && (
-                <div style={{ 
-                    position: 'fixed', 
-                    inset: 0, 
-                    background: 'rgba(0,0,0,0.85)', 
-                    zIndex: 9999, 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    zIndex: 9999,
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     backdropFilter: 'blur(5px)',
                     padding: '20px'
                 }} onClick={() => setPreviewMember(null)}>
-                    <div style={{ 
-                        background: '#f8fafc', 
-                        padding: '2rem', 
-                        borderRadius: '16px', 
-                        maxWidth: '900px', 
-                        width: '100%', 
+                    <div style={{
+                        background: '#f8fafc',
+                        padding: '2rem',
+                        borderRadius: '16px',
+                        maxWidth: '900px',
+                        width: '100%',
                         position: 'relative',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
                         overflowY: 'auto',
                         maxHeight: '90vh'
                     }} onClick={e => e.stopPropagation()}>
-                        <button 
+                        <button
                             onClick={() => setPreviewMember(null)}
                             style={{ position: 'absolute', top: '15px', right: '15px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                             &times;
                         </button>
-                        
+
                         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                             <h2 style={{ margin: 0, color: '#1e293b' }}>Preview Kartu Anggota</h2>
                             <p style={{ margin: '5px 0', color: '#64748b' }}>{previewMember.nama} ({previewMember.no_anggota})</p>
@@ -1258,11 +1258,11 @@ const App = () => {
 const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout, primaryColor, bgImage, isBack, backText }) => {
     if (isBack) {
         return (
-            <div className="id-card-render" style={{ 
-                width: '92mm', 
-                height: '60mm', 
-                position: 'relative', 
-                overflow: 'hidden', 
+            <div className="id-card-render" style={{
+                width: '92mm',
+                height: '60mm',
+                position: 'relative',
+                overflow: 'hidden',
                 background: 'white',
                 border: 'none',
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)'
@@ -1277,7 +1277,7 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                         <svg width="100%" height="100%" viewBox="0 0 92 60">
                             <g fill="none" stroke={primaryColor} strokeWidth="0.15">
                                 {Array.from({ length: 15 }).map((_, i) => (
-                                    <path key={`bw-${i}`} d={`M${i*6},0 C${20+i*2},30 ${50-i*3},50 100,${60-i*2}`} />
+                                    <path key={`bw-${i}`} d={`M${i * 6},0 C${20 + i * 2},30 ${50 - i * 3},50 100,${60 - i * 2}`} />
                                 ))}
                             </g>
                         </svg>
@@ -1286,23 +1286,23 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
 
                 {/* Header Biru/Hijau - Selalu muncul agar teks terbaca */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: `${layout.backHeaderHeight}mm`, background: primaryColor, zIndex: 2 }}></div>
-                
+
                 {/* Konten Teks - Selalu muncul di lapisan paling atas */}
-                <div style={{ 
-                    position: 'absolute', 
-                    top: `${layout.backHeaderTextTop}mm`, 
-                    left: 0, 
-                    right: 0, 
-                    height: `${layout.backHeaderHeight}mm`, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    color: 'white', 
-                    fontSize: `${layout.backHeaderFontSize}pt`, 
-                    fontWeight: 'bold', 
-                    zIndex: 3, 
-                    textAlign: 'center', 
-                    padding: '0 2mm' 
+                <div style={{
+                    position: 'absolute',
+                    top: `${layout.backHeaderTextTop}mm`,
+                    left: 0,
+                    right: 0,
+                    height: `${layout.backHeaderHeight}mm`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: `${layout.backHeaderFontSize}pt`,
+                    fontWeight: 'bold',
+                    zIndex: 3,
+                    textAlign: 'center',
+                    padding: '0 2mm'
                 }}>
                     {backText.header}
                 </div>
@@ -1320,17 +1320,17 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                 <div style={{ position: 'absolute', bottom: `${layout.backFooterBottom}mm`, left: 0, right: 0, textAlign: 'center', zIndex: 3, color: primaryColor, fontWeight: 'bold', fontSize: `${layout.backFooterFontSize}pt`, fontStyle: 'italic' }}>
                     {backText.footer}
                 </div>
-                <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '1px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
+                <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '0px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
             </div>
         );
     }
 
     return (
-        <div className="id-card-render" style={{ 
-            width: '92mm', 
-            height: '60mm', 
-            position: 'relative', 
-            overflow: 'hidden', 
+        <div className="id-card-render" style={{
+            width: '92mm',
+            height: '60mm',
+            position: 'relative',
+            overflow: 'hidden',
             background: 'white',
             border: 'none',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)'
@@ -1338,13 +1338,13 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
             {bgImage && (
                 <img src={bgImage} alt="Background Front" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
             )}
-            
+
             {/* Background Pattern */}
             {!bgImage && (
-                <div style={{ 
-                    position: 'absolute', 
-                    inset: 0, 
-                    opacity: 0.1, 
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0.1,
                     pointerEvents: 'none',
                     overflow: 'hidden',
                     zIndex: 1
@@ -1352,10 +1352,10 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                     <svg width="100%" height="100%" viewBox="0 0 92 60">
                         <g fill="none" stroke={primaryColor} strokeWidth="0.15">
                             {Array.from({ length: 12 }).map((_, i) => (
-                                <path key={`w1-${i}`} d={`M${-10 + i*2},60 C${20 + i*5},${55 - i*2} ${50 + i*2},${45 + i*2} ${100},${58 - i}`} />
+                                <path key={`w1-${i}`} d={`M${-10 + i * 2},60 C${20 + i * 5},${55 - i * 2} ${50 + i * 2},${45 + i * 2} ${100},${58 - i}`} />
                             ))}
                             {Array.from({ length: 12 }).map((_, i) => (
-                                <path key={`w2-${i}`} d={`M${-10 + i*3},55 C${30 + i*2},${45 + i} ${60 + i*5},${50 - i*2} ${100},${52 + i}`} />
+                                <path key={`w2-${i}`} d={`M${-10 + i * 3},55 C${30 + i * 2},${45 + i} ${60 + i * 5},${50 - i * 2} ${100},${52 + i}`} />
                             ))}
                         </g>
                     </svg>
@@ -1363,15 +1363,15 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
             )}
 
             {/* Header Area with forced primary color background */}
-            <div className="id-card-header" style={{ 
-                zIndex: 3, 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                right: 0, 
-                height: `${layout.headerHeight}mm`, 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div className="id-card-header" style={{
+                zIndex: 3,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: `${layout.headerHeight}mm`,
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 background: primaryColor // Force the green color here
             }}>
@@ -1382,14 +1382,14 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                         <div style={{ width: '80%', height: '80%', background: 'rgba(255,255,255,0.2)', borderRadius: '50%' }}></div>
                     )}
                 </div>
-                <div style={{ 
+                <div style={{
                     position: 'absolute',
                     left: `${layout.headerLogoLeft + layout.logoLeftSize}mm`,
                     right: `${layout.headerLogoRight + layout.logoRightSize}mm`,
                     top: `${layout.headerTextTop}mm`,
                     bottom: '0',
-                    textAlign: 'center', 
-                    lineHeight: 1.1, 
+                    textAlign: 'center',
+                    lineHeight: 1.1,
                     color: 'white',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1409,14 +1409,14 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                 </div>
             </div>
 
-            <div className="id-card-body" style={{ 
-                zIndex: 2, 
-                position: 'absolute', 
-                top: `${layout.bodyTop}mm`, 
-                left: `${layout.bodyLeft}mm`, 
-                right: `${layout.bodyRight}mm`, 
-                display: 'flex', 
-                flexDirection: 'column', 
+            <div className="id-card-body" style={{
+                zIndex: 2,
+                position: 'absolute',
+                top: `${layout.bodyTop}mm`,
+                left: `${layout.bodyLeft}mm`,
+                right: `${layout.bodyRight}mm`,
+                display: 'flex',
+                flexDirection: 'column',
                 maxHeight: '35mm',
                 pointerEvents: 'none'
             }}>
@@ -1431,30 +1431,30 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                                 { label: 'Unit / Instansi', value: member.unit, isAddress: true }
                             ].map((row, i) => (
                                 <tr key={i} style={{ verticalAlign: 'top', color: '#000', lineHeight: 1.2 }}>
-                                    <td style={{ 
-                                        width: `${layout.labelWidth}mm`, 
-                                        fontSize: `${layout.bodyFontSize}pt`, 
-                                        whiteSpace: 'nowrap', 
+                                    <td style={{
+                                        width: `${layout.labelWidth}mm`,
+                                        fontSize: `${layout.bodyFontSize}pt`,
+                                        whiteSpace: 'nowrap',
                                         overflow: 'hidden',
                                         textAlign: 'left',
-                                        padding: `${layout.lineSpacing/2}mm 0`
+                                        padding: `${layout.lineSpacing / 2}mm 0`
                                     }}>
                                         {row.label}
                                     </td>
-                                    <td style={{ 
-                                        width: '4mm', 
-                                        fontSize: `${layout.bodyFontSize}pt`, 
+                                    <td style={{
+                                        width: '4mm',
+                                        fontSize: `${layout.bodyFontSize}pt`,
                                         textAlign: 'center',
-                                        padding: `${layout.lineSpacing/2}mm 0`
+                                        padding: `${layout.lineSpacing / 2}mm 0`
                                     }}>
                                         :
                                     </td>
-                                    <td style={{ 
+                                    <td style={{
                                         fontSize: `${layout.bodyFontSize}pt`,
                                         textAlign: 'left',
                                         fontWeight: row.bold ? (row.upper ? '900' : 'bold') : 'normal',
                                         textTransform: row.upper ? 'uppercase' : 'none',
-                                        padding: `${layout.lineSpacing/2}mm 0`,
+                                        padding: `${layout.lineSpacing / 2}mm 0`,
                                         paddingRight: row.isAddress ? `${(layout.qrSize / 3.78) + layout.qrRight - layout.bodyRight + 1}mm` : '0',
                                         wordBreak: 'break-word',
                                         lineHeight: 1.1
@@ -1468,28 +1468,28 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
                 </div>
             </div>
 
-            <div style={{ 
-                zIndex: 4, 
-                position: 'absolute', 
-                top: `${layout.footerTop}mm`, 
-                left: `${layout.footerLeft}mm`, 
-                fontWeight: 'bold', 
-                color: primaryColor, 
-                fontStyle: 'italic', 
+            <div style={{
+                zIndex: 4,
+                position: 'absolute',
+                top: `${layout.footerTop}mm`,
+                left: `${layout.footerLeft}mm`,
+                fontWeight: 'bold',
+                color: primaryColor,
+                fontStyle: 'italic',
                 fontSize: `${layout.footerFontSize}pt`,
                 whiteSpace: 'nowrap'
             }}>
                 Masa Berlaku : <span>{validityText}</span>
             </div>
 
-            <div style={{ 
-                zIndex: 3, 
-                position: 'absolute', 
-                top: `${layout.qrTop}mm`, 
-                right: `${layout.qrRight}mm`, 
-                background: 'white', 
-                padding: '1mm', 
-                borderRadius: '3px', 
+            <div style={{
+                zIndex: 3,
+                position: 'absolute',
+                top: `${layout.qrTop}mm`,
+                right: `${layout.qrRight}mm`,
+                background: 'white',
+                padding: '1mm',
+                borderRadius: '3px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1497,7 +1497,7 @@ const IDCard = ({ member, logoLeft, logoRight, headerText, validityText, layout,
             }}>
                 <QRCodeSVG value={String(member.no_anggota)} size={layout.qrSize} />
             </div>
-            <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '1px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
+            <div className="no-print" style={{ position: 'absolute', top: '3mm', left: '3mm', width: '86mm', height: '54mm', border: '0px dashed white', borderRadius: '2mm', zIndex: 20, pointerEvents: 'none', opacity: 0.6 }}></div>
         </div>
     );
 };

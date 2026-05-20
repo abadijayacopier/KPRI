@@ -7,12 +7,14 @@
   --card-bg: #ffffff;
   --text: #0f172a;
   --accent: #ef4444;
-  
+
   --id-width: 92mm;
   --id-height: 60mm;
   --text-margin: 5mm;
-  --text-width: 82mm; /* 92 - 10 */
-  --text-height: 50mm; /* 60 - 10 */
+  --text-width: 82mm;
+  /* 92 - 10 */
+  --text-height: 50mm;
+  /* 60 - 10 */
 }
 
 * {
@@ -43,7 +45,8 @@ body {
   margin-bottom: 2rem;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: var(--primary);
   margin-bottom: 1rem;
 }
@@ -141,36 +144,39 @@ h1, h2 {
 
 /* Print Layout */
 .print-media-a3plus {
-    width: 470mm;
-    height: 310mm;
-    padding: 5mm;
-    background: white;
-    display: grid;
-    grid-template-columns: repeat(5, 92mm);
-    grid-template-rows: repeat(5, 60mm);
-    gap: 0;
-    page-break-after: always;
-    overflow: hidden;
-    margin: 0 auto;
+  width: 470mm;
+  height: 310mm;
+  padding: 5mm;
+  background: white;
+  display: grid;
+  grid-template-columns: repeat(5, 92mm);
+  grid-template-rows: repeat(5, 60mm);
+  gap: 0;
+  page-break-after: always;
+  overflow: hidden;
+  margin: 0 auto;
 }
 
 @media print {
-    @page {
-        size: 470mm 310mm;
-        margin: 0 !important;
-    }
-    body {
-        margin: 0 !important;
-        padding: 0 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    .no-print {
-        display: none !important;
-    }
-    .print-area {
-        display: block !important;
-    }
+  @page {
+    size: 470mm 310mm;
+    margin: 0 !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-area {
+    display: block !important;
+  }
 }
 
 .no-print {
@@ -185,7 +191,8 @@ h1, h2 {
   margin-top: 1rem;
 }
 
-.member-list th, .member-list td {
+.member-list th,
+.member-list td {
   padding: 0.75rem;
   border-bottom: 1px solid #e2e8f0;
   text-align: left;
