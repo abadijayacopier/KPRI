@@ -161,7 +161,7 @@ h2 {
 .print-media-200x300 {
   width: 200mm;
   height: 300mm;
-  padding: 8mm 8mm;
+  padding: 0 8mm;
   background: white;
   display: grid;
   grid-template-columns: repeat(2, 92mm);
