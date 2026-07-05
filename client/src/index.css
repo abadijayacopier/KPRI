@@ -157,6 +157,21 @@ h2 {
   margin: 0 auto;
 }
 
+/* Print Layout 200mm x 300mm (2 columns x 5 rows = 10 cards per page) */
+.print-media-200x300 {
+  width: 200mm;
+  height: 300mm;
+  padding: 8mm 8mm;
+  background: white;
+  display: grid;
+  grid-template-columns: repeat(2, 92mm);
+  grid-template-rows: repeat(5, 60mm);
+  gap: 0;
+  page-break-after: always;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
 @media print {
   @page {
     size: 470mm 310mm;

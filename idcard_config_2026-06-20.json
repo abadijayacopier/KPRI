@@ -1,0 +1,57 @@
+{
+  "layout": {
+    "headerHeight": 20.5,
+    "bodyTop": 18,
+    "bodyLeft": 4,
+    "footerTop": 49,
+    "qrTop": 39,
+    "qrRight": 7,
+    "qrSize": 40,
+    "logoLeftSize": 11.5,
+    "logoRightSize": 19,
+    "bodyRight": 6,
+    "lineSpacing": 0.9,
+    "headerLogoTopLeft": 6.5,
+    "headerLogoTopRight": 6.5,
+    "headerLogoLeft": 6,
+    "headerLogoRight": 6,
+    "headerFontSize": 12,
+    "titleFontSize": 10.5,
+    "bodyFontSize": 7.5,
+    "footerFontSize": 8.5,
+    "footerLeft": 6.5,
+    "headerTextTop": 3,
+    "labelWidth": 22,
+    "backHeaderHeight": 11.5,
+    "backTitleTop": 12.5,
+    "backFooterBottom": 6,
+    "backRulesLeft": 8,
+    "backRuleSpacing": 1.5,
+    "backHeaderFontSize": 8,
+    "backTitleFontSize": 8.2,
+    "backRulesFontSize": 7.5,
+    "backFooterFontSize": 7,
+    "backHeaderTextTop": 1.5,
+    "backRulesTop": 21
+  },
+  "headerText": {
+    "line1": "KOPERASI KONSUMEN",
+    "line2": "\"KPRI KARYA GUNA\"",
+    "line3": "NOMOR : AHU -0003503.AH.01.38. TAHUN 2025",
+    "line4": "KECAMATAN LEMBEYAN - KAB. MAGETAN",
+    "cardTitle": "KARTU ANGGOTA KOPERASI"
+  },
+  "validityText": "Selama Menjadi Anggota",
+  "primaryColor": "#1e40af",
+  "backText": {
+    "header": "KOPERASI KONSUMEN \"KPRI KARYA GUNA\"",
+    "title": "Peraturan dan Ketentuan Koperasi",
+    "rules": [
+      "Kartu ini adalah bukti keanggotaan sah Koperasi Konsumen \"KPRI KARYA GUNA\".",
+      "Wajib dibawa saat melakukan Transaksi Simpan Pinjam.",
+      "Dilarang memindahtangankan kartu ini kepada orang lain.",
+      "Apabila kartu Hilang/Rusak segera lapor / hubungi bagian Administrasi Koperasi."
+    ],
+    "footer": "Kartu ini berlaku selama menjadi anggota KK \"KPRI KARYA GUNA\""
+  }
+}

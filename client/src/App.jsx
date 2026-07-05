@@ -158,6 +158,7 @@ const App = () => {
     });
     const itemsPerPage = 25;
     const componentRef = useRef();
+    const componentRef200x300 = useRef();
 
     useEffect(() => {
         setPreviewIndex(0);
@@ -430,6 +431,90 @@ const App = () => {
             doc.save(`ID_CARDS_PRODUKSI_${new Date().getTime()}.pdf`);
             if (window.Swal) {
                 window.Swal.fire('Berhasil!', 'PDF Produksi 300 DPI telah siap.', 'success');
+            } else {
+                alert('PDF Berhasil didownload!');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Gagal mengekspor PDF: ' + err.message);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    };
+
+    const handleExportPDF200x300 = async () => {
+        if (selectedMembers.length === 0) {
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'Data Belum Dipilih',
+                    text: 'Mohon centang minimal satu anggota di tabel untuk diekspor ke PDF.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0891b2'
+                });
+            } else {
+                alert('Pilih data anggota terlebih dahulu!');
+            }
+            return;
+        }
+
+        const btn = document.getElementById('btn-export-pdf-200x300');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Memproses PDF... Mohon Tunggu...';
+        btn.disabled = true;
+
+        try {
+            // Load libraries if not already loaded
+            if (!window.jspdf) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+            }
+
+            const { jsPDF } = window.jspdf;
+            // Create PDF with custom size 200mm x 300mm
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: [200, 300]
+            });
+
+            const printArea = componentRef200x300.current;
+            const pages = printArea.querySelectorAll('.print-media-200x300');
+
+            // Temporarily show print area for capture
+            const originalDisplay = printArea.parentElement.style.display;
+            printArea.parentElement.style.display = 'block';
+            printArea.parentElement.style.position = 'absolute';
+            printArea.parentElement.style.left = '-9999px';
+            printArea.parentElement.style.top = '0';
+
+            for (let i = 0; i < pages.length; i++) {
+                btn.innerHTML = `<span class="spinner"></span> Memproses Halaman ${i + 1}/${pages.length}...`;
+
+                if (i > 0) doc.addPage([200, 300], 'portrait');
+
+                const canvas = await window.html2canvas(pages[i], {
+                    scale: 3.125, // 300 DPI
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                doc.addImage(imgData, 'JPEG', 0, 0, 200, 300);
+
+                // Small delay to let UI breath
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            // Restore print area
+            printArea.parentElement.style.display = originalDisplay;
+            printArea.parentElement.style.position = '';
+            printArea.parentElement.style.left = '';
+
+            doc.save(`ID_CARDS_200x300_${new Date().getTime()}.pdf`);
+            if (window.Swal) {
+                window.Swal.fire('Berhasil!', 'PDF 200×300mm (Depan + Belakang) telah siap.', 'success');
             } else {
                 alert('PDF Berhasil didownload!');
             }
@@ -791,26 +876,34 @@ const App = () => {
                     </div>
                 </div>
 
-                <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <button id="btn-export-pdf" className="btn btn-primary" onClick={handleDirectExportPDF} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#0891b2' }}>
-                        <FileText size={20} />
-                        Download PDF (Otomatis)
-                    </button>
-                    <button className="btn btn-primary" onClick={handlePrint} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#6366f1' }}>
-                        <Printer size={20} />
-                        Cetak Manual (Browser)
-                    </button>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginLeft: '1rem' }}>
-                        <input
-                            type="checkbox"
-                            id="backOnce"
-                            checked={printBackOnce}
-                            onChange={(e) => setPrintBackOnce(e.target.checked)}
-                            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                        />
-                        <label htmlFor="backOnce" style={{ fontWeight: 'bold', cursor: 'pointer', color: '#475569' }}>Hanya Cetak 1 Halaman Belakang (Efisien)</label>
+                <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <button id="btn-export-pdf" className="btn btn-primary" onClick={handleDirectExportPDF} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#0891b2' }}>
+                            <FileText size={20} />
+                            PDF A3+ (470×310mm)
+                        </button>
+                        <button id="btn-export-pdf-200x300" className="btn btn-primary" onClick={handleExportPDF200x300} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#7c3aed' }}>
+                            <FileText size={20} />
+                            PDF 200×300mm (Depan+Belakang)
+                        </button>
+                        <button className="btn btn-primary" onClick={handlePrint} style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', background: '#6366f1' }}>
+                            <Printer size={20} />
+                            Cetak Manual (Browser)
+                        </button>
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: 'auto' }}>*Gunakan kertas A3+ (329 x 483 mm)</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                            <input
+                                type="checkbox"
+                                id="backOnce"
+                                checked={printBackOnce}
+                                onChange={(e) => setPrintBackOnce(e.target.checked)}
+                                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="backOnce" style={{ fontWeight: 'bold', cursor: 'pointer', color: '#475569' }}>Hanya Cetak 1 Halaman Belakang (Efisien)</label>
+                        </div>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: 'auto' }}>*A3+: 470×310mm | Kecil: 200×300mm (10 kartu/hal)</span>
+                    </div>
                 </div>
 
                 <div className="card" style={{ marginBottom: '2rem' }}>
@@ -1184,6 +1277,32 @@ const App = () => {
                             )}
                         </React.Fragment>
                     ))}
+                </div>
+            </div>
+            {/* Hidden Print Area for 200mm x 300mm */}
+            <div style={{ display: 'none' }}>
+                <div ref={componentRef200x300} className="print-area">
+                    {Array.from({ length: Math.ceil(selectedMembers.length / 10) }).map((_, pageIndex) => {
+                        const pageMembers = selectedMembers.slice(pageIndex * 10, (pageIndex + 1) * 10);
+                        return (
+                            <React.Fragment key={`200x300-${pageIndex}`}>
+                                {/* Front Sheet */}
+                                <div className="print-media-200x300" style={{ pageBreakAfter: 'always' }}>
+                                    {pageMembers.map(member => (
+                                        <IDCard key={`front200-${member.id}`} member={member} logoLeft={logoLeft} logoRight={logoRight} headerText={headerText} validityText={validityText} layout={layout} primaryColor={primaryColor} bgImage={bgFront} />
+                                    ))}
+                                </div>
+                                {/* Back Sheet - jumlah kartu belakang sesuai jumlah kartu depan */}
+                                {(!printBackOnce || pageIndex === 0) && (
+                                    <div className="print-media-200x300" style={{ pageBreakAfter: 'always' }}>
+                                        {Array.from({ length: pageMembers.length }).map((_, idx) => (
+                                            <IDCard key={`back200-${pageIndex}-${idx}`} isBack={true} bgImage={bgBack} primaryColor={primaryColor} backText={backText} layout={layout} />
+                                        ))}
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
                 </div>
             </div>
             {/* Preview Modal Overlay */}
